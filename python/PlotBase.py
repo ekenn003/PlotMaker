@@ -56,14 +56,39 @@ class PlotBase(object):
             xlow = 0.17
             xhigh = xlow + w
         elif pos in [2,5]:
-            xlow = 0.5 - w/2.
-            xhigh = 0.5 + w/2.
+            xlow = 0.575 - w/2.
+            xhigh = 0.575 + w/2.
         elif pos in [3,6]:
             xhigh = 0.93
             xlow = xhigh - w
 
         return xlow, ylow, xhigh, yhigh
 
+
+
+    ## _______________________________________________________
+    def getLegend(self, var, pos, datahist, stackhist):
+        ## get legend coordinates
+        legXlow_, legYlow_, legXhigh_, legYhigh_ = self.getLegendCoordinates(pos, self.legendWidth, self.legendHeight)
+        leg = ROOT.TLegend(legXlow_, legYlow_, legXhigh_, legYhigh_)
+        # add data
+        leg.AddEntry(datahist, self.fullDataTitle, 'lep')
+        # add mc
+        if self.drawBigLegend:
+            for hist in reversed(stackhist.GetHists()):
+                leg.AddEntry(hist, hist.GetName(), 'F2')
+        else:
+            mcHistList_ = []
+            for hist in reversed(stackhist.GetHists()):
+                if hist.GetName()[:2] not in mcHistList_:
+                    leg.AddEntry(hist, hist.GetName()[:2], 'F2')
+                    mcHistList_ += [hist.GetName()[:2]]
+        # set style
+        leg.SetFillColor(0)
+        leg.SetBorderSize(1)
+        leg.SetLineColor(ROOT.kWhite)
+        leg.SetHeader(var)
+        return leg
 
 
     ## _______________________________________________________
