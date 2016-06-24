@@ -6,6 +6,7 @@ import tools.tdrstyle as tdrstyle
 import logging
 import math
 from collections import OrderedDict
+from variables import varnames
 
 
 ## ___________________________________________________________
@@ -17,12 +18,16 @@ class PlotBase(object):
         # empty sample lists
         self.mcsamplelist = {}
         self.datasamplelist = {}
-        self.varnames = {}
+        self.varnames = varnames
         # set tdr style
         tdrstyle.setTDRStyle()
         # CMS_lumi parameters
         self.iPeriod = 4
         self.iPos = 0
+        # blinding region
+        self.blindLow = 122.
+        self.blindHigh = 128.
+
 
 
     ## _______________________________________________________
@@ -100,6 +105,8 @@ class PlotBase(object):
     
         htype = samplelist[sample]['type']
         # scale MC hists appropriately
+        if 'hWeight' in var:
+            h.Scale(1./h.Integral())
         if ismc:
             xsec = samplelist[sample]['xsec']
             sumw = samplelist[sample]['sumw']
