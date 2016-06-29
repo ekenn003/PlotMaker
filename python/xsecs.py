@@ -13,7 +13,7 @@ xsecs = {
     'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'             :     57.35     * pb,
     'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'    :    114.5      * pb,
     'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' :    114.6      * pb,
-    # tt associated production w/boson
+    # tt associated production w/boson (inclusive)
     'TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8'          :      3.697    * pb,
     'ttZJets_13TeV_madgraphMLM'                                        :      0.259    * pb,
     'ttWJets_13TeV_madgraphMLM'                                        :      0.243    * pb,
@@ -21,7 +21,7 @@ xsecs = {
     # t associated production w/boson
     'tZq_ll_4f_13TeV-amcatnlo-pythia8_TuneCUETP8M1'                    :      0.0758   * pb,
 
-    # 76X only:
+    # don't use:
     'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8'             :      0.2529   * pb,
 
     # W (choose one)
