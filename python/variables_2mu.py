@@ -1,4 +1,4 @@
-# variables.py
+# PlotMaker/python/variables_2mu.py
 '''
 leglinlog: 
     legend position for (linear plot, log plot)
@@ -61,33 +61,33 @@ varnames = {
         'leglinlog' : (3,6),
     },
 
-    'hMuPt_u' : {
-        'title' : 'Muon p_{T} (yes RC no SF)',
-        'xMin' : 0., 'xMax' : 100.,
-        'xLabel' : 'p_{T #mu}',
-        'binSize' : 5., # GeV
-        'yUnits' : 'GeV/c',
-        'leglinlog' : (3,6),
-    },
-
-    'hMuPt_nrc' : {
-        'title' : 'Muon p_{T} (no RC yes SF)',
-        'xMin' : 0., 'xMax' : 100.,
-        'xLabel' : 'p_{T #mu}',
-        'binSize' : 5., # GeV
-        'yUnits' : 'GeV/c',
-        'leglinlog' : (3,6),
-    },
-
-    'hMuPt_nrc_u' : {
-        'title' : 'Muon p_{T} (no RC no SF)',
-        'xMin' : 0., 'xMax' : 100.,
-        'xLabel' : 'p_{T #mu}',
-        'binSize' : 5., # GeV
-        'yUnits' : 'GeV/c',
-        'leglinlog' : (3,6),
-    },
-
+#    'hMuPt_u' : {
+#        'title' : 'Muon p_{T} (yes RC no SF)',
+#        'xMin' : 0., 'xMax' : 100.,
+#        'xLabel' : 'p_{T #mu}',
+#        'binSize' : 5., # GeV
+#        'yUnits' : 'GeV/c',
+#        'leglinlog' : (3,6),
+#    },
+#
+#    'hMuPt_nrc' : {
+#        'title' : 'Muon p_{T} (no RC yes SF)',
+#        'xMin' : 0., 'xMax' : 100.,
+#        'xLabel' : 'p_{T #mu}',
+#        'binSize' : 5., # GeV
+#        'yUnits' : 'GeV/c',
+#        'leglinlog' : (3,6),
+#    },
+#
+#    'hMuPt_nrc_u' : {
+#        'title' : 'Muon p_{T} (no RC no SF)',
+#        'xMin' : 0., 'xMax' : 100.,
+#        'xLabel' : 'p_{T #mu}',
+#        'binSize' : 5., # GeV
+#        'yUnits' : 'GeV/c',
+#        'leglinlog' : (3,6),
+#    },
+#
 #    'hMuEnergy' : {
 #        'title' : 'Muon E',
 #        'xMin' : 0., 'xMax' : 100.,
@@ -139,32 +139,32 @@ varnames = {
         'leglinlog' : (3,3),
     },
 
-    'hDiMuInvMass_u' : {
-        'title' : 'Dimuon invariant mass (yes RC no SF)',
-        'xMin' : 60., 'xMax' : 150.,
-        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
-        'binSize' : 2., # GeV
-        'yUnits' : 'GeV/c^{2}',
-        'leglinlog' : (3,3),
-    },
-
-    'hDiMuInvMass_nrc' : {
-        'title' : 'Dimuon invariant mass (no RC yes SF)',
-        'xMin' : 60., 'xMax' : 150.,
-        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
-        'binSize' : 2., # GeV
-        'yUnits' : 'GeV/c^{2}',
-        'leglinlog' : (3,3),
-    },
-
-    'hDiMuInvMass_nrc_u' : {
-        'title' : 'Dimuon invariant mass (no RC no SF)',
-        'xMin' : 60., 'xMax' : 150.,
-        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
-        'binSize' : 2., # GeV
-        'yUnits' : 'GeV/c^{2}',
-        'leglinlog' : (3,3),
-    },
+#    'hDiMuInvMass_u' : {
+#        'title' : 'Dimuon invariant mass (yes RC no SF)',
+#        'xMin' : 60., 'xMax' : 150.,
+#        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
+#        'binSize' : 2., # GeV
+#        'yUnits' : 'GeV/c^{2}',
+#        'leglinlog' : (3,3),
+#    },
+#
+#    'hDiMuInvMass_nrc' : {
+#        'title' : 'Dimuon invariant mass (no RC yes SF)',
+#        'xMin' : 60., 'xMax' : 150.,
+#        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
+#        'binSize' : 2., # GeV
+#        'yUnits' : 'GeV/c^{2}',
+#        'leglinlog' : (3,3),
+#    },
+#
+#    'hDiMuInvMass_nrc_u' : {
+#        'title' : 'Dimuon invariant mass (no RC no SF)',
+#        'xMin' : 60., 'xMax' : 150.,
+#        'xLabel' : 'M_{#mu^{+}#mu^{-}}',
+#        'binSize' : 2., # GeV
+#        'yUnits' : 'GeV/c^{2}',
+#        'leglinlog' : (3,3),
+#    },
 
     'hDiMuEta' : {
         'title' : 'Dimuon eta',
