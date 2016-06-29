@@ -3,6 +3,7 @@ import array
 import ROOT
 from tools.CMS_lumi import CMS_lumi
 import tools.tdrstyle as tdrstyle
+from tools.tools import getXsec
 import logging
 import math
 from collections import OrderedDict
@@ -97,8 +98,11 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def getWeightedHist(self, var, sample, ismc):
-        '''Returns weighted histogram (weight=1 if data)'''
+    def getWeightedHist(self, var, sample, newbinsize, ismc):
+        '''
+        Returns weighted histogram (weight=1 if data).
+        Rebinning: if newBinSize = 0, rebinning is not performed.
+        '''
         samplelist = self.mcsamplelist if ismc else self.datasamplelist
 
         h = (samplelist[sample]['tfile']).Get(var).Clone()
@@ -108,9 +112,11 @@ class PlotBase(object):
         if 'hWeight' in var:
             h.Scale(1./h.Integral())
         if ismc:
-            xsec = samplelist[sample]['xsec']
+            xsec = getXsec(samplelist[sample]['source'])
             sumw = samplelist[sample]['sumw']
             h.Scale((self.lumi * xsec)/(sumw))
+        # rebin
+        
 
         # blind signal region in data
         if not ismc and 'DiMuInvMass' in var:
