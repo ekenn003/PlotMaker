@@ -1,3 +1,5 @@
+pb = 1. # picobarns
+
 xsecs = {
     # data
     'DoubleMuon'                                                       : 1.,
@@ -19,7 +21,7 @@ xsecs = {
 
     'tZq_ll_4f_13TeV-amcatnlo-pythia8_TuneCUETP8M1'                    :      0.0758   * pb,
 
-    # 
+    # W (choose one)
     'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8'               :  61526.7      * pb,
     'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'                :  61526.7      * pb,
 
