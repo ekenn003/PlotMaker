@@ -1,6 +1,7 @@
 # python/tools/tools.py
-from xsecs import xsecs
+from xsections import xsecs
 
+## ___________________________________________________________
 def getXsec(sample):
     if sample in xsecs:
         return xsecs[sample]
