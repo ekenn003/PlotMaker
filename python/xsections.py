@@ -1,4 +1,4 @@
-# python/crosssections.py
+# python/xsections.py
 
 pb = 1. # picobarns
 
