@@ -180,6 +180,28 @@ class PlotBase(object):
             fillColor = ROOT.kBlue-2
             fillStyle = 1001
             markerSize = 0.
+        elif htype=='extra1':
+            lineColor = 3
+            lineStyle = 1
+            lineWidth = 1
+            fillColor = 3
+            fillStyle = 1001
+            markerSize = 0.
+        elif htype=='extra2':
+            lineColor = 6
+            lineStyle = 1
+            lineWidth = 1
+            fillColor = 6
+            fillStyle = 1001
+            markerSize = 0.
+        elif htype=='extra3':
+            lineColor = 7
+            lineStyle = 1
+            lineWidth = 1
+            fillColor = 7
+            fillStyle = 1001
+            markerSize = 0.
+
         h.SetLineColor(lineColor)
         h.SetLineStyle(lineStyle)
         h.SetLineWidth(lineWidth)
