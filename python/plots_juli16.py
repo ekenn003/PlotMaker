@@ -1,6 +1,6 @@
 from PlotBase import PlotBase
 from tools.CMS_lumi import CMS_lumi
-from files import *
+from datasets import mc_80X, data_80X
 from variables_2mu import varnames
 import ROOT
 class juli16Plotter(PlotBase):
@@ -8,7 +8,7 @@ class juli16Plotter(PlotBase):
         super(juli16Plotter, self).__init__(args)
         self.varnames = varnames
 
-        self.lumi = 4336 # pb^-1
+        self.lumi = 6260 # pb^-1
         #self.drawBigLegend = False
         self.drawBigLegend = True
         self.legendWidth = 0.16
@@ -18,17 +18,18 @@ class juli16Plotter(PlotBase):
 
     def plot(self):
 
-        self.extrainfo = '25_25'
-        self.mcsamplelist = mc_juli16
+        self.extrainfo = '80X_25_25'
+        self.mcsamplelist = mc_80X
         self.fullDataTitle = 'SingleMuon'
-        self.datasamplelist = data_juli16
+        self.datasamplelist = data_80X
 
 
         self.mcStackOrder = [
             'DYJets',
-            'TTJets',
             'TTZJets',
             'TTWJets',
+            'tZq_ll_4f',
+            'TTJets',
         ]
 
 
@@ -153,7 +154,7 @@ class juli16Plotter(PlotBase):
 
                 stack = ROOT.THStack()
                 for sample in reversed(self.mcStackOrder):
-                    stack.Add(self.getWeightedHist(var+'_ctrl', sample, self.varnames[var]['binSize'], ismc=True))
+                    stack.Add(self.getWeightedHist('control/'+var+'_ctrl', sample, self.varnames[var]['binSize'], ismc=True))
 
                 stack.Draw('hist')
 
@@ -170,7 +171,7 @@ class juli16Plotter(PlotBase):
                 # draw data histogram
                 datalist = ROOT.TList()
                 for sample in self.datasamplelist:
-                    datalist.Add(self.getWeightedHist(var='_ctrl', sample, self.varnames[var]['binSize'], ismc=False))
+                    datalist.Add(self.getWeightedHist('control/'+var+'_ctrl', sample, self.varnames[var]['binSize'], ismc=False))
                 datahist = ROOT.TH1F(datalist.At(0).Clone('datahist'))
                 datahist.Reset()
                 datahist.Merge(datalist)
