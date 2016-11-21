@@ -1,13 +1,14 @@
 import os, sys
 import array
-import ROOT
-from tools.CMS_lumi import CMS_lumi
-import tools.tdrstyle as tdrstyle
-from tools.tools import getXsec
 import logging
 import math
 from collections import OrderedDict
-from variables import varnames
+import ROOT
+from tools.CMS_lumi import CMS_lumi
+from tools.tools import getXsec
+import tools.tdrstyle as tdrstyle
+from datasets import *
+import argparse
 
 
 ## ___________________________________________________________
@@ -17,17 +18,22 @@ class PlotBase(object):
         # set batch mode
         ROOT.gROOT.SetBatch(ROOT.kTRUE)
         # empty sample lists
-        self.mcsamplelist = {}
-        self.datasamplelist = {}
-        self.varnames = varnames
+        self.signal_sets = []
+        self.signal_hists = []
+        self.signal_scale = None
+        self.background_sets = []
+        self.data_sets = []
+#        self.mcsamplelist = {}
+#        self.datasamplelist = {}
+#        self.varnames = {}
         # set tdr style
         tdrstyle.setTDRStyle()
         # CMS_lumi parameters
         self.iPeriod = 4
         self.iPos = 0
         # blinding region
-        self.blindLow = 122.
-        self.blindHigh = 128.
+        self.blindlow = 122.
+        self.blindhigh = 128.
 
 
 
@@ -37,7 +43,42 @@ class PlotBase(object):
         pass
 
     ## _______________________________________________________
-    def getLegendCoordinates(self, pos, w, h):
+    def get_canvas(self, canvname, w, h):
+        tcanv = ROOT.TCanvas(canvname, canvname, w, h)
+        tcanv.SetLeftMargin(0.12)
+        tcanv.SetRightMargin(0.04)
+        tcanv.SetTopMargin(0.08)
+        tcanv.SetBottomMargin(0.12)
+        return tcanv
+
+
+
+    ## _______________________________________________________
+    def get_plotpad(self, canvname):
+        plotpad = ROOT.TPad(canvname+'_plot', canvname+'_plot', 0.0, 0.2, 1.0, 1.0)
+        plotpad.SetBottomMargin(0.03)
+        plotpad.SetBorderMode(0)
+        plotpad.SetBorderSize(0)
+        plotpad.SetLeftMargin(0.14)
+        plotpad.SetRightMargin(0.04)
+        plotpad.SetTopMargin(0.08/0.8)
+        return plotpad
+
+
+    ## _______________________________________________________
+    def get_pullpad(self, canvname):
+        pullpad = ROOT.TPad(canvname+'_pull', canvname+'_pull', 0.0, 0.0, 1.0, 0.2)
+        pullpad.SetTopMargin(0.01)
+        pullpad.SetBorderMode(0)
+        pullpad.SetBorderSize(0)
+        pullpad.SetLeftMargin(0.14)
+        pullpad.SetRightMargin(0.04)
+        pullpad.SetBottomMargin(0.12/0.2)
+        return pullpad
+
+
+    ## _______________________________________________________
+    def get_legend_coordinates(self, pos, w, h):
         '''
         Legend pos. for each var:
          -------------
@@ -73,22 +114,35 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def getLegend(self, var, pos, datahist, stackhist):
-        ## get legend coordinates
-        legXlow_, legYlow_, legXhigh_, legYhigh_ = self.getLegendCoordinates(pos, self.legendWidth, self.legendHeight)
+    def get_legend(self, var, pos, datahist, stackhist):
+        # get legend coordinates
+        legXlow_, legYlow_, legXhigh_, legYhigh_ = self.get_legend_coordinates(pos, self.legend_width, self.legend_height)
         leg = ROOT.TLegend(legXlow_, legYlow_, legXhigh_, legYhigh_)
+
         # add data
-        leg.AddEntry(datahist, self.fullDataTitle, 'lep')
+        leg.AddEntry(datahist, self.full_data_title, 'lep')
+
         # add mc
-        if self.drawBigLegend:
+        if self.draw_big_legend:
             for hist in reversed(stackhist.GetHists()):
                 leg.AddEntry(hist, hist.GetName(), 'F2')
         else:
-            mcHistList_ = []
+            mc_hists = []
             for hist in reversed(stackhist.GetHists()):
-                if hist.GetName()[:2] not in mcHistList_:
-                    leg.AddEntry(hist, hist.GetName()[:2], 'F2')
-                    mcHistList_ += [hist.GetName()[:2]]
+                hname_ = hist.GetName()
+                if hname_ in ['WWW', 'WWZ', 'WZZ', 'ZZZ']:
+                    htype_ = 'VVV'
+                else:
+                    htype_ = hist.GetName()[:2]
+                if htype_ not in mc_hists:
+                    leg.AddEntry(hist, htype_, 'F2')
+                    mc_hists += [htype_]
+
+        # add signals
+        if self.signal_hists:
+            for hist in self.signal_hists:
+                leg.AddEntry(hist, hist.GetName(), 'lep')
+
         # set style
         leg.SetFillColor(0)
         leg.SetBorderSize(1)
@@ -98,35 +152,51 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def getWeightedHist(self, var, sample, newbinsize, ismc):
+    def get_weighted_hist(self, var, sample, lumi, newbinsize=0):
         '''
         Returns weighted histogram (weight=1 if data).
         Rebinning: if newBinSize = 0, rebinning is not performed.
         '''
-        samplelist = self.mcsamplelist if ismc else self.datasamplelist
 
-        h = (samplelist[sample]['tfile']).Get(var).Clone()
-    
-        htype = samplelist[sample]['type']
+        ismc = True if sample.kind in ['sig','bkg'] else False
+
+        try:
+            h = sample.tfile.Get(('categories/' if 'Category' in var else '') + var).Clone()
+        except:
+            h = ROOT.TH1F()
+            print 'failed in getting hist "{0}" from sample "{1}"'.format(var, sample.name)
+
+        htype = sample.group
+
         # scale MC hists appropriately
         if 'hWeight' in var:
             h.Scale(1./h.Integral())
         if ismc:
-            xsec = getXsec(samplelist[sample]['source'])
-            sumw = samplelist[sample]['sumw']
-            h.Scale((self.lumi * xsec)/(sumw))
-        # rebin
-        
+            xsec = sample.xsec
+            sumw = sample.sumw
+            scale_number = (self.lumi * xsec) / sumw
+            if sample.kind=='sig': scale_number *= self.signal_scale
+            h.Scale(scale_number)
+            #print ('\n' \
+            #      'scaling hist from {0} by '.format(sample.name) \
+            #      '( {0} * {1} {2}) / ( {3} ) = {4}'.format(self.lumi, xsec, '* {0} '.format(self.signal_scale) if sample.kind=='sig' else '', sumw, scale_number) \
+            #      '\n')
+
+        # rebin?
+        curbinsize = h.GetBinWidth(1)
+        if (newbinsize != 0 and newbinsize >= curbinsize):
+            rebinnum = newbinsize/curbinsize
+            h.Rebin(int(rebinnum))
 
         # blind signal region in data
         if not ismc and 'DiMuInvMass' in var:
-            binWidth = h.GetXaxis().GetBinWidth(1)
-            blindBinLow = int(math.floor(self.blindLow/binWidth))
-            blindBinHigh = int(math.ceil(self.blindHigh/binWidth))
-            for b in range(blindBinLow, blindBinHigh):
+            binwidth = h.GetXaxis().GetBinWidth(1)
+            blindbin_low = int(math.floor(self.blindlow/binwidth))
+            blindbin_high = int(math.ceil(self.blindhigh/binwidth))
+            for b in range(blindbin_low, blindbin_high):
                 h.SetBinContent(b, 0.)
 
-        h.SetName(sample)
+        h.SetName(sample.name)
 
         # default = data
         lineColor = ROOT.kBlack
@@ -180,11 +250,11 @@ class PlotBase(object):
             fillColor = ROOT.kBlue-2
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='extra1':
-            lineColor = 3
+        elif htype=='VVV':
+            lineColor = ROOT.kGreen-2
             lineStyle = 1
             lineWidth = 1
-            fillColor = 3
+            fillColor = ROOT.kGreen-2
             fillStyle = 1001
             markerSize = 0.
         elif htype=='extra2':
@@ -214,14 +284,14 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def getRatioHist(self, top, bottom, var):
+    def get_ratio_hist(self, top, bottom, var):
         '''Returns histogram whose bin contents are those of top divided by those of bottom.'''
         rh = top.Clone()
         rh.Divide(top, bottom, 1., 1., '') # option "B" means the hists are correlated
         rh.SetMarkerSize(0.7)
         rh.SetMarkerStyle(20)
         rh.SetStats(ROOT.kFALSE)
-        rh.GetYaxis().SetRangeUser(0.5,1.5)
+        rh.GetYaxis().SetRangeUser(0.5, 1.5)
         rh.GetYaxis().SetTitle('data/mc')
         rh.GetYaxis().SetTitleOffset(0.32)
         rh.SetLineColor(ROOT.kAzure-6)
