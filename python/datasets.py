@@ -86,17 +86,17 @@ dsetdb = {
     },
     'WMinusH_HToMuMu' : {
         'kind'  : 'sig',
-        'group' : 'VH',
+        'group' : 'WH',
         'label' : 'W^{-}H',
     },
     'WPlusH_HToMuMu' : {
         'kind'  : 'sig',
-        'group' : 'VH',
+        'group' : 'WH',
         'label' : 'W^{+}H',
     },
     'ZH_HToMuMu' : {
         'kind'  : 'sig',
-        'group' : 'VH',
+        'group' : 'ZH',
         'label' : 'ZH',
     },
 
@@ -114,28 +114,40 @@ dsetdb = {
         'label' : 'TT+Jets',
     },
 
-    'TTZTo2L2Nu' : {
+    'TTWJetsToLNu' : {
         'kind'  : 'bkg',
-        'group' : 'TTZ',
-        'label' : 'TTZ#rightarrow 2l2#nu',
+        'group' : 'TTV',
+        'label' : 'TTW#rightarrowl#nu',
+    },
+
+    'TTZToLLNuNu' : {
+        'kind'  : 'bkg',
+        'group' : 'TTV',
+        'label' : 'TTZ#rightarrow2l2#nu',
+    },
+
+    'WJetsToLNu' : {
+        'kind'  : 'bkg',
+        'group' : 'W',
+        'label' : 'W+Jets#rightarrowl#nu',
     },
 
     'WWTo2L2Nu' : {
         'kind'  : 'bkg',
         'group' : 'WW',
-        'label' : 'WW#rightarrow 2l2#nu',
+        'label' : 'WW#rightarrow2l2#nu',
     },
 
     'WZTo2L2Q' : {
         'kind'  : 'bkg',
         'group' : 'WZ',
-        'label' : 'WZ#rightarrow 2l2j',
+        'label' : 'WZ#rightarrow2l2j',
     },
 
     'WZTo3LNu' : {
         'kind'  : 'bkg',
         'group' : 'WZ',
-        'label' : 'WZ#rightarrow 3l#nu',
+        'label' : 'WZ#rightarrow3l#nu',
     },
 
     'ZZTo2L2Nu' : {
@@ -180,82 +192,80 @@ dsetdb = {
         'label' : 'ZZZ',
     },
 
+    'TZQ_ll_4f' : {
+        'kind'  : 'bkg',
+        'group' : 'T',
+        'label' : 'TZQ_ll_4f',
+    },
+
+    'ST_tW_antitop_5f' : {
+        'kind'  : 'bkg',
+        'group' : 'extra3',
+        'label' : 'ST_tW_antitop_5f',
+    },
+
+    'ST_tW_top_5f' : {
+        'kind'  : 'bkg',
+        'group' : 'extra4',
+        'label' : 'ST_tW_top_5f',
+    },
+
 ##### data
 
-    'SingleMuon_Run2015C' : {
+    'SingleMuon_Run2016Bv2' : {
         'kind'  : 'data',
         'group' : 'data',
-        'label' : 'SingleMuon_Run 15C',
-        'lumi'  : 0.,
-    },
-    'SingleMuon_Run2015D' : {
-        'kind'  : 'data',
-        'group' : 'data',
-        'label' : 'SingleMuon_Run 15D',
-        'lumi'  : 0.,
-    },
-
-    'SingleMuon_Run2016B' : {
-        'kind'  : 'data',
-        'group' : 'data',
-        'label' : 'SingleMuon Run2016Bv1',
-        'lumi'  : 5887.799,
-    },
-
-    'SingleMuon_Run2016Bv3' : {
-        'kind'  : 'data',
-        'group' : 'data',
-        'label' : 'SingleMuon Run2016Bv3',
-        'lumi'  : 5855.410,
+        'label' : 'SingleMuon Run2016Bv2',
+        'lumi'  : 5788.1,
     },
 
     'SingleMuon_Run2016C' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon Run2016C',
-        'lumi'  : 2645.968,
+        'lumi'  : 2573.1,
     },
 
     'SingleMuon_Run2016D' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon Run2016D',
-        'lumi'  : 4353.449,
+        'lumi'  : 4248.1,
     },
 
     'SingleMuon_Run2016E' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon 2016E',
-        'lumi'  : 4049.732, # /pb
+        'lumi'  : 4009.1, # /pb
     },
 
     'SingleMuon_Run2016F' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon 2016F',
-        'lumi'  : 3157.021, # /pb
+        'lumi'  : 3102.1, # /pb
     },
 
     'SingleMuon_Run2016G' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon 2016G',
-        'lumi'  : 7260.835, # /pb
+        'lumi'  : 7540.1, # /pb
     },
 
     'SingleMuon_Run2016Hv2' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon 2016Hv2',
-        'lumi'  : 8284.592, # /pb
+        'lumi'  : 8391.1, # /pb
     },
 
     'SingleMuon_Run2016Hv3' : {
         'kind'  : 'data',
         'group' : 'data',
         'label' : 'SingleMuon 2016Hv3',
-        'lumi'  : 216.783, # /pb
+        'lumi'  : 215.1, # /pb
     },
 
 

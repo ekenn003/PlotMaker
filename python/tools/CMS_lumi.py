@@ -10,7 +10,7 @@ cmsText     = "CMS";
 cmsTextFont   = 61  
 
 writeExtraText = True
-extraText   = "       Preliminary"
+extraText   = "Preliminary"
 extraTextFont = 52 
 
 lumiTextSize     = 0.5
@@ -32,9 +32,10 @@ lumi_sqrtS = ""
 
 drawLogo      = False
 
-def CMS_lumi(pad,  iPeriod,  iPosX , lumi):
+def CMS_lumi(pad,  iPeriod,  iPosX , lumi, textra=None):
+    if textra: extraText = textra
     # convert lumi to fb
-    lumi_13TeV = str(lumi*0.001) + " fb^{-1}"
+    lumi_13TeV = '{0:.3f} fb^{{-1}}'.format(lumi*0.001)
     outOfFrame    = False
     if(iPosX/10==0 ): outOfFrame = True
 
