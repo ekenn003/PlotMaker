@@ -19,18 +19,14 @@ class PlotBase(object):
         ROOT.gROOT.SetBatch(ROOT.kTRUE)
         # empty sample lists
         self.signal_sets = []
-        self.signal_hists = []
-        self.signal_scale = None
+        self.signal_scale = 1.
         self.background_sets = []
         self.data_sets = []
-#        self.mcsamplelist = {}
-#        self.datasamplelist = {}
-#        self.varnames = {}
         # set tdr style
         tdrstyle.setTDRStyle()
         # CMS_lumi parameters
         self.iPeriod = 4
-        self.iPos = 0
+        self.iPos = 10
         # blinding region
         self.blindlow = 122.
         self.blindhigh = 128.
@@ -43,7 +39,7 @@ class PlotBase(object):
         pass
 
     ## _______________________________________________________
-    def get_canvas(self, canvname, w, h):
+    def get_canvas(self, canvname, w, h, ):
         tcanv = ROOT.TCanvas(canvname, canvname, w, h)
         tcanv.SetLeftMargin(0.12)
         tcanv.SetRightMargin(0.04)
@@ -54,8 +50,9 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def get_plotpad(self, canvname):
-        plotpad = ROOT.TPad(canvname+'_plot', canvname+'_plot', 0.0, 0.2, 1.0, 1.0)
+    def get_plotpad(self, canvname, usepull=True):
+        ylow = 0.2 if usepull else 0.1
+        plotpad = ROOT.TPad(canvname+'_plot', canvname+'_plot', 0.0, ylow, 1.0, 1.0)
         plotpad.SetBottomMargin(0.03)
         plotpad.SetBorderMode(0)
         plotpad.SetBorderSize(0)
@@ -114,34 +111,37 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def get_legend(self, var, pos, datahist, stackhist):
+    def get_legend(self, var, pos, datahist=None, stackhist=None, sighists=None):
         # get legend coordinates
         legXlow_, legYlow_, legXhigh_, legYhigh_ = self.get_legend_coordinates(pos, self.legend_width, self.legend_height)
         leg = ROOT.TLegend(legXlow_, legYlow_, legXhigh_, legYhigh_)
 
         # add data
-        leg.AddEntry(datahist, self.full_data_title, 'lep')
+        if datahist:
+            leg.AddEntry(datahist, self.full_data_title, 'lep')
 
         # add mc
-        if self.draw_big_legend:
-            for hist in reversed(stackhist.GetHists()):
-                leg.AddEntry(hist, hist.GetName(), 'F2')
-        else:
-            mc_hists = []
-            for hist in reversed(stackhist.GetHists()):
-                hname_ = hist.GetName()
-                if hname_ in ['WWW', 'WWZ', 'WZZ', 'ZZZ']:
-                    htype_ = 'VVV'
-                else:
-                    htype_ = hist.GetName()[:2]
-                if htype_ not in mc_hists:
-                    leg.AddEntry(hist, htype_, 'F2')
-                    mc_hists += [htype_]
+        if stackhist:
+            if self.draw_big_legend:
+                for hist in reversed(stackhist.GetHists()):
+                    leg.AddEntry(hist, hist.GetName(), 'F2')
+            else:
+                mc_hists = []
+                for hist in reversed(stackhist.GetHists()):
+                    hname_ = hist.GetName()
+                    if hname_ in ['WWW', 'WWZ', 'WZZ', 'ZZZ']:
+                        hgroup_ = 'VVV'
+                    else:
+                        hgroup_ = hist.GetName()[:2]
+                    if hgroup_ not in mc_hists:
+                        leg.AddEntry(hist, hgroup_, 'F2')
+                        mc_hists += [hgroup_]
 
         # add signals
-        if self.signal_hists:
-            for hist in self.signal_hists:
-                leg.AddEntry(hist, hist.GetName(), 'lep')
+        if sighists:
+            for hist in sighists:
+                #leg.AddEntry(hist, hist.GetName().split('_')[0] + ' signal x{0}'.format(int(self.signal_scale)), 'l')
+                leg.AddEntry(hist, hist.GetName().split('_')[0] + ' signal', 'l')
 
         # set style
         leg.SetFillColor(0)
@@ -166,7 +166,7 @@ class PlotBase(object):
             h = ROOT.TH1F()
             print 'failed in getting hist "{0}" from sample "{1}"'.format(var, sample.name)
 
-        htype = sample.group
+        hgroup = sample.group
 
         # scale MC hists appropriately
         if 'hWeight' in var:
@@ -175,12 +175,15 @@ class PlotBase(object):
             xsec = sample.xsec
             sumw = sample.sumw
             scale_number = (self.lumi * xsec) / sumw
+
+
+
             if sample.kind=='sig': scale_number *= self.signal_scale
             h.Scale(scale_number)
-            #print ('\n' \
-            #      'scaling hist from {0} by '.format(sample.name) \
-            #      '( {0} * {1} {2}) / ( {3} ) = {4}'.format(self.lumi, xsec, '* {0} '.format(self.signal_scale) if sample.kind=='sig' else '', sumw, scale_number) \
-            #      '\n')
+            #print
+            #print 'scaling hist from {0} by '.format(sample.name)
+            #print '    ( {0} * {1} {2}) / ( {3} ) = {4}'.format(self.lumi, xsec, '* {0} '.format(self.signal_scale) if sample.kind=='sig' else '', sumw, scale_number)
+            #print
 
         # rebin?
         curbinsize = h.GetBinWidth(1)
@@ -208,67 +211,114 @@ class PlotBase(object):
         markerStyle = 20
 
         # set MC style    
-        if htype=='ZZ':
+        if hgroup=='ZZ':
             lineColor = ROOT.kViolet-5
             lineStyle = 1
             lineWidth = 1
             fillColor = ROOT.kViolet-5
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='WZ':
+        elif hgroup=='WZ':
             lineColor = ROOT.kAzure+5
             lineStyle = 1
             lineWidth = 0
             fillColor = ROOT.kAzure+5
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='TT' or htype=='TTZ':
+        elif hgroup=='TT' or hgroup=='TTZ':
             lineColor = ROOT.kRed+2
             lineStyle = 1
             lineWidth = 0
             fillColor = ROOT.kRed+2
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='DY':
+        elif hgroup=='DY':
             lineColor = ROOT.kOrange-3
             lineStyle = 1
             lineWidth = 0
             fillColor = ROOT.kOrange-3
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='W':
+        elif hgroup=='W':
             lineColor = ROOT.kMagenta-6
             lineStyle = 1
             lineWidth = 0
             fillColor = ROOT.kMagenta-6
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='WW':
+        elif hgroup=='WW':
             lineColor = ROOT.kBlue-2
             lineStyle = 1
             lineWidth = 1
             fillColor = ROOT.kBlue-2
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='VVV':
+        elif hgroup=='VVV':
             lineColor = ROOT.kGreen-2
             lineStyle = 1
             lineWidth = 1
             fillColor = ROOT.kGreen-2
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='extra2':
+
+        elif hgroup=='GGF':
+            lineColor = ROOT.kViolet
+            lineStyle = 1
+            lineWidth = 2
+            fillColor = 0
+            fillStyle = 0
+            markerSize = 0.
+
+        elif hgroup=='VBF':
+            lineColor = ROOT.kGreen
+            lineStyle = 1
+            lineWidth = 2
+            fillColor = 0
+            fillStyle = 0
+            markerSize = 0.
+
+        elif hgroup=='ZH':
+            lineColor = ROOT.kBlue
+            lineStyle = 1
+            lineWidth = 2
+            fillColor = 0
+            fillStyle = 0
+            markerSize = 0.
+
+        elif hgroup=='WH':
+            lineColor = ROOT.kRed
+            lineStyle = 1
+            lineWidth = 2
+            fillColor = 0
+            fillStyle = 0
+            markerSize = 0.
+
+        elif hgroup=='TTV':
+            lineColor = ROOT.kCyan
+            lineStyle = 1
+            lineWidth = 1
+            fillColor = ROOT.kCyan
+            fillStyle = 1001
+            markerSize = 0.
+        elif hgroup=='T':
             lineColor = 6
             lineStyle = 1
             lineWidth = 1
             fillColor = 6
             fillStyle = 1001
             markerSize = 0.
-        elif htype=='extra3':
+        elif hgroup=='extra3':
             lineColor = 7
             lineStyle = 1
             lineWidth = 1
             fillColor = 7
+            fillStyle = 1001
+            markerSize = 0.
+        elif hgroup=='extra4':
+            lineColor = 8
+            lineStyle = 1
+            lineWidth = 1
+            fillColor = 8
             fillStyle = 1001
             markerSize = 0.
 
@@ -284,24 +334,30 @@ class PlotBase(object):
 
 
     ## _______________________________________________________
-    def get_ratio_hist(self, top, bottom, var):
+    def get_ratio_hist(self, top, bottom, var, **kwargs):
         '''Returns histogram whose bin contents are those of top divided by those of bottom.'''
+        xmin = kwargs.pop('xmin', 0.)
+        xmax = kwargs.pop('xmax', 50.)
+        # override
+        if var in self.varnames:
+            xmin = self.varnames[var]['xMin']
+            xmax = self.varnames[var]['xMax']
+
         rh = top.Clone()
         rh.Divide(top, bottom, 1., 1., '') # option "B" means the hists are correlated
         rh.SetMarkerSize(0.7)
         rh.SetMarkerStyle(20)
         rh.SetStats(ROOT.kFALSE)
-        rh.GetYaxis().SetRangeUser(0.5, 1.5)
+        rh.GetYaxis().SetRangeUser(0.8, 1.2)
         rh.GetYaxis().SetTitle('data/mc')
         rh.GetYaxis().SetTitleOffset(0.32)
         rh.SetLineColor(ROOT.kAzure-6)
         rh.SetFillColor(ROOT.kAzure-4)
-        rh.GetXaxis().SetTitle(self.varnames[var]['xLabel'])
         rh.GetXaxis().SetLabelFont(42)
         rh.GetXaxis().SetLabelSize(0.2)
         rh.GetXaxis().SetLabelOffset(-0.01)
         rh.GetXaxis().SetTickLength(0.1)
-        rh.GetXaxis().SetRangeUser(self.varnames[var]['xMin'], self.varnames[var]['xMax'])
+        rh.GetXaxis().SetRangeUser(xmin, xmax)
         rh.GetYaxis().SetLabelFont(42)
         rh.GetYaxis().SetLabelSize(.12)
         rh.GetYaxis().SetNdivisions(2)
@@ -309,7 +365,5 @@ class PlotBase(object):
         rh.SetTitle('')
 
         return rh
-
-
 
 
